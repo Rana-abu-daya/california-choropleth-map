@@ -6,7 +6,7 @@ import json
 st.set_page_config(layout="wide", page_title="California Map")
 
 # Streamlit app title
-st.title("Eligible Arab Voters by County in California")
+st.title("Eligible Muslim Voters by County in California.")
 
 # Load processed data
 data_path = "arab_voters_by_countyWithNames.csv"  # Your pre-aggregated data: County, Count
