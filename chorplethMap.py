@@ -6,7 +6,7 @@ import json
 st.set_page_config(layout="wide", page_title="California Map")
 
 # Streamlit app title
-st.title("Eligible Muslim Voters by County in California.")
+st.title("Eligible Muslim Voters by County in California")
 
 # Load processed data
 data_path = "arab_voters_by_countyWithNames.csv"  # Your pre-aggregated data: County, Count
@@ -61,14 +61,64 @@ fig = go.Figure(go.Choroplethmapbox(
 # Set map focus to California
 fig.update_layout(
     mapbox_style="carto-positron",
-    mapbox_zoom=5.5,
-    mapbox_center={"lat": 37.5, "lon": -119.5},
+    mapbox_zoom=5,
+    mapbox_center={"lat": 36.7783, "lon": -119.4179},  # California center
     margin={"r": 0, "t": 0, "l": 0, "b": 0},
     height=600,
     width=500,
     coloraxis_colorbar=dict(
-        title="Arab Voter Count"
+        title="Muslim Voter Count"
     )
 )
 
 st.plotly_chart(fig, use_container_width=True)
+######################## City ########################
+# Streamlit app title
+st.title("Eligible Muslim Voters by City in California")
+
+# Load the data
+data = pd.read_csv("Muslim_voters_by_city.csv")
+data["City"] = data["City"].str.strip().str.title()
+
+# Hover text
+data["hover_text"] = data["City"] + ": " + data["arab_voter_count"].apply(lambda x: f"{x:,}")
+
+# Load GeoJSON
+with open("California_Incorporated_Cities.geojson", "r") as file:
+    geojson_data = json.load(file)
+
+# Choropleth map
+fig = go.Figure(go.Choroplethmapbox(
+    geojson=geojson_data,
+    locations=data["City"],
+    z=data["arab_voter_count"],
+    featureidkey="properties.CITY",  # Adjust if different in GeoJSON
+    colorscale=[
+        [0, "white"],
+        [0.01, "yellow"],
+        [0.05, "lightgreen"],
+        [0.25, "green"],
+        [1, "darkgreen"]
+    ],
+    marker_opacity=0.8,
+    marker_line_width=1,
+    text=data["hover_text"],
+    hovertemplate="%{text}<extra></extra>"
+))
+
+# Layout
+fig.update_layout(
+    mapbox_style="carto-positron",
+    mapbox_zoom=5,
+    mapbox_center={"lat": 36.7783, "lon": -119.4179},  # California center
+    margin={"r": 0, "t": 0, "l": 0, "b": 0},
+    height=600,
+    width=500,
+    coloraxis_colorbar=dict(
+        title="Muslim Voter Count"
+    )
+)
+
+st.plotly_chart(fig, use_container_width=True)
+
+
